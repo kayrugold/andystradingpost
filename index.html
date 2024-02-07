@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <!-- Load jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="gallery"></div>
+    
+    <!-- Image container template -->
+    <template id="imageTemplate">
+        <div class="imageContainer"><img></div>
+    </template>
+
+    <script>
+        // Path relative to the index.html file
+        const imgFolderPath = 'img';
+        
+        $(document).ready(function() {
+            $.ajax({
+                url: `${imgFolderPath}/`,
+                type: 'GET',
+                error: function () {
+                    console.error('Failed getting file names');
+                },
+                success: function(data) {
+                    const $gallery = $('#gallery');
+                    const template = document.getElementById("imageTemplate").content;
+                    const fragment = document.createDocumentFragment();
+                    const regex = /\.(jpg|png|gif)$/i;
+
+                    Array.from($(data).find('a')).forEach((link) => {
+                        if (regex.test(link.text)) {
+                            let filenameWithExtension = link.text;
+                            let fullFilePath = `${imgFolderPath}/${filenameWithExtension}`;
+
+                            // Clone the template element
+                            let clone = template.cloneNode(true);
+                            
+                            // Set the source attribute for the <img> element
+                            clone.querySelector('img').src = fullFilePath;
+                            fragment.appendChild(clone);
+                        }
+                    });
+
+                    $gallery.append(fragment);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
